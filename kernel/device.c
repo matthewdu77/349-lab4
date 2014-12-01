@@ -31,8 +31,8 @@
 
 struct dev
 {
-	tcb_t* sleep_queue;
-	unsigned long   next_match;
+  tcb_t* sleep_queue;
+  unsigned long   next_match;
 };
 typedef struct dev dev_t;
 
@@ -45,8 +45,12 @@ static dev_t devices[NUM_DEVICES];
  */
 void dev_init(void)
 {
-   /* the following line is to get rid of the warning and should not be needed */	
-   devices[0]=devices[0];
+  int i;
+  for (i = 0; i < NUM_DEVICES; i++)
+  {
+    devices[i].sleep_queue = 0;
+    devices[i].next_match = dev_freq[i];
+  }
 }
 
 
@@ -58,12 +62,12 @@ void dev_init(void)
  */
 void dev_wait(unsigned int dev __attribute__((unused)))
 {
-	tcb_t *task = get_cur_tcb();
+  tcb_t *task = get_cur_tcb();
 
-	task->sleep_queue = devices[dev].sleep_queue;
-	devices[dev].sleep_queue = task;
+  task->sleep_queue = devices[dev].sleep_queue;
+  devices[dev].sleep_queue = task;
 
-	displatch_sleep();
+  dispatch_sleep();
 }
 
 
@@ -76,6 +80,29 @@ void dev_wait(unsigned int dev __attribute__((unused)))
  */
 void dev_update(unsigned long millis __attribute__((unused)))
 {
-	
+  tcb_t *temp;
+  int reschedule = 0;
+
+  int i;
+  for (i = 0; i < NUM_DEVICES; i++)
+  {
+    if (millis >= NUM_DEVICES[i].next_match)
+    {
+      devices[i].next_match += dev_freq[i];
+      temp = devices[i].sleep_queue;
+
+      while (temp)
+      {
+        runqueue_add(temp, temp->cur_prio);
+        temp = temp->sleep_queue;
+        reschedule = 1;
+      }
+
+      devices[i].sleep_queue = 0;
+    }
+  }
+
+  if (reschedule)
+    request_rescheudle();
 }
 
