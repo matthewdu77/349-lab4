@@ -28,7 +28,7 @@ static __attribute__((unused)) tcb_t* cur_tcb; /* use this if needed */
  */
 void dispatch_init(tcb_t* idle __attribute__((unused)))
 {
-	
+  cur_tcb = idle;
 }
 
 
@@ -42,7 +42,19 @@ void dispatch_init(tcb_t* idle __attribute__((unused)))
  */
 void dispatch_save(void)
 {
-	
+  tcb_t *next_tcb;
+  tcb_t *prev_tcb;
+
+  if (cur_tcb->cur_prio <= highest_prio())
+    return;
+
+  prev_tcb = runqueue_remove(highest_prio());
+  runqueue_add(cur_tcb, cur_tcb->cur_prio);
+
+  next_tcb = cur_tcb;
+  cur_tcb = prev_tcb;
+
+  ctx_switch_full(&prev_tcb->context, &next_tcb->context);
 }
 
 /**
@@ -53,7 +65,8 @@ void dispatch_save(void)
  */
 void dispatch_nosave(void)
 {
-
+  cur_tcb = runqueue_remove(highest_prio());
+  ctx_switch_half(&cur_tcb->context);
 }
 
 
@@ -65,7 +78,15 @@ void dispatch_nosave(void)
  */
 void dispatch_sleep(void)
 {
-	
+  tcb_t *next_tcb;
+  tcb_t *prev_tcb;
+
+  prev_tcb = runqueue_remove(highest_prio());
+
+  next_tcb = cur_tcb;
+  cur_tcb = prev_tcb;
+
+  ctx_switch_full(&prev_tcb->context, &next_tcb->context);
 }
 
 /**
@@ -73,7 +94,7 @@ void dispatch_sleep(void)
  */
 uint8_t get_cur_prio(void)
 {
-	return 1; //fix this; dummy return to prevent compiler warning
+  return cur_tcb->cur_prio;
 }
 
 /**
@@ -81,5 +102,5 @@ uint8_t get_cur_prio(void)
  */
 tcb_t* get_cur_tcb(void)
 {
-	return (tcb_t *) 0; //fix this; dummy return to prevent compiler warning
+  return cur_tcb;
 }
