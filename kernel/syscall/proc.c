@@ -24,12 +24,40 @@
 
 int task_create(task_t* tasks  __attribute__((unused)), size_t num_tasks  __attribute__((unused)))
 {
-  return 1; /* remove this line after adding your code */
+  size_t i;
+
+  if (num_tasks > OS_MAX_TASKS - 2)
+  	return -EINVAL;
+
+  if (!valid_addr(&tasks, size_of(task_t) * num_tasks, USR_START_ADDR, USR_END_ADDR))
+  	return -EFAULT;
+
+  // TODO : ub_test.c assign_schedule(&tasks, num_tasks)
+
+  disable_interrupts();
+  allocate_tasks(&tasks, num_tasks);
+  dispatch_nosave();
+
+
+  // This should never return
+  return -1;
 }
 
 int event_wait(unsigned int dev  __attribute__((unused)))
 {
-  return 1; /* remove this line after adding your code */	
+  tcb_t *task = get_cur_tcb();
+
+  if (dev >= NUM_DEVICES)
+  	return -EINVAL;
+
+  if (task->holds_lock)
+  	return -EDEADLOCK;
+
+  disable_interrupts();
+  dev_wait(dev);
+  enable_interrupts();
+
+  return 1;
 }
 
 /* An invalid syscall causes the kernel to exit. */
