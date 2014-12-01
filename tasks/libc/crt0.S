@@ -11,4 +11,6 @@
 	.file "crt0.S"
 
 FUNC(_start)
-	@ needs code.  Put your names at the top.
+  ldr r0, [sp]   @ give argc
+  add r1, sp, #4 @ give argv
+  bl main
