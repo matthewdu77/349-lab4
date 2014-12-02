@@ -15,6 +15,7 @@
 #include <arm/reg.h>
 #include <arm/psr.h>
 #include <arm/exception.h>
+#include <arm/interrupt.h>
 
 /**
  * @brief Fake device maintainence structure.
@@ -86,7 +87,8 @@ void dev_update(unsigned long millis __attribute__((unused)))
   int i;
   for (i = 0; i < NUM_DEVICES; i++)
   {
-    if (millis >= NUM_DEVICES[i].next_match)
+    // TODO: not robust against overflow
+    if (millis >= devices[i].next_match)
     {
       devices[i].next_match += dev_freq[i];
       temp = devices[i].sleep_queue;
@@ -103,6 +105,6 @@ void dev_update(unsigned long millis __attribute__((unused)))
   }
 
   if (reschedule)
-    request_rescheudle();
+    request_reschedule();
 }
 

@@ -27,11 +27,24 @@
  * @return 0  The test failed.
  * @return 1  Test succeeded.  The tasks are now in order.
  */
-int assign_schedule(task_t** tasks  __attribute__((unused)), size_t num_tasks  __attribute__((unused)))
+int assign_schedule(task_t** tasks, size_t num_tasks)
 {
-
-	return 1; // fix this; dummy return to prevent compiler warnings	
+  size_t i, j;
+  // selection sort is easy to code
+  for (i = 0; i < num_tasks; i++)
+  {
+    int max = i;
+    for (j = i+1; j < num_tasks; j++)
+    {
+      if (tasks[max]->T > tasks[j]->T)
+      {
+        max = j;
+      }
+    }
+    task_t* temp = tasks[i];
+    tasks[i] = tasks[max];
+    tasks[max] = temp;
+  }
+	return 1;
 }
 	
-
-

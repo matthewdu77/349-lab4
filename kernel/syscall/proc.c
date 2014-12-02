@@ -22,20 +22,29 @@
 #include <arm/physmem.h>
 #include <device.h>
 
-int task_create(task_t* tasks  __attribute__((unused)), size_t num_tasks  __attribute__((unused)))
+int task_create(task_t* tasks, size_t num_tasks)
 {
   size_t i;
 
   if (num_tasks > OS_MAX_TASKS - 2)
   	return -EINVAL;
 
-  if (!valid_addr(&tasks, size_of(task_t) * num_tasks, USR_START_ADDR, USR_END_ADDR))
+  if (!valid_addr(tasks, sizeof(task_t) * num_tasks, USR_START_ADDR, USR_END_ADDR))
   	return -EFAULT;
 
+  // TODO : sanity checking
   // TODO : ub_test.c assign_schedule(&tasks, num_tasks)
 
+  task_t *(task_array[OS_MAX_TASKS]);
+  for (i = 0; i < num_tasks; i++)
+  {
+    task_array[i] = &(tasks[i]);
+  }
+
+  assign_schedule(task_array, num_tasks);
+
   disable_interrupts();
-  allocate_tasks(&tasks, num_tasks);
+  allocate_tasks(task_array, num_tasks);
   dispatch_nosave();
 
 
@@ -43,7 +52,7 @@ int task_create(task_t* tasks  __attribute__((unused)), size_t num_tasks  __attr
   return -1;
 }
 
-int event_wait(unsigned int dev  __attribute__((unused)))
+int event_wait(unsigned int dev)
 {
   tcb_t *task = get_cur_tcb();
 
@@ -61,7 +70,7 @@ int event_wait(unsigned int dev  __attribute__((unused)))
 }
 
 /* An invalid syscall causes the kernel to exit. */
-void invalid_syscall(unsigned int call_num  __attribute__((unused)))
+void invalid_syscall(unsigned int call_num)
 {
 	printf("Kernel panic: invalid syscall -- 0x%08x\n", call_num);
 
