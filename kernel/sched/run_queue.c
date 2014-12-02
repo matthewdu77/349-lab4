@@ -11,6 +11,7 @@
 
 #include <kernel.h>
 #include <sched.h>
+#include <exports.h>
 #include "sched_i.h"
 
 
@@ -96,8 +97,9 @@ tcb_t* runqueue_remove(uint8_t prio)
 {
   uint8_t group = prio >> 3;
   uint8_t position = prio & 0x7;
-  group_run_bits &= ~(1 << group);
   run_bits[group] &= ~(1 << position);
+  if (run_bits[group] == 0)
+    group_run_bits &= ~(1 << group);
 
   return run_list[prio];
 }

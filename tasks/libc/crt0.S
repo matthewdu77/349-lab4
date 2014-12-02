@@ -14,3 +14,5 @@ FUNC(_start)
   ldr r0, [sp]   @ give argc
   add r1, sp, #4 @ give argv
   bl main
+finish:
+  b finish

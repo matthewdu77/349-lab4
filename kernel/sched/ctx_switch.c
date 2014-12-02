@@ -29,8 +29,6 @@ static tcb_t* cur_tcb; /* use this if needed */
 void dispatch_init(tcb_t* idle __attribute__((unused)))
 {
   cur_tcb = idle;
-  cur_tcb->native_prio = 0xff;
-  cur_tcb->cur_prio = cur_tcb->native_prio;
 }
 
 
@@ -83,10 +81,11 @@ void dispatch_sleep(void)
   tcb_t *next_tcb;
   tcb_t *prev_tcb;
 
-  if (cur_tcb->cur_prio <= highest_prio())
-    return;
+  int prio = highest_prio();
+  next_tcb = runqueue_remove(prio);
 
-  next_tcb = runqueue_remove(highest_prio());
+  if (prio == OS_MAX_TASKS-1) // only remove if not the idle task
+    runqueue_add(next_tcb, next_tcb->cur_prio);
 
   prev_tcb = cur_tcb;
   cur_tcb = next_tcb;

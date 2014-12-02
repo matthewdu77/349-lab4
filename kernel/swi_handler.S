@@ -24,6 +24,11 @@ swi_handler:
     @ store spsr above gp registers
     str     r2, [sp, #14*4]
 
+    @ recover user register and save
+    mrs      r0, spsr
+    stmfd    sp, {sp, lr}^
+    add      sp, sp, #-8
+
     @ Enables irqs
     mrs     r2, cpsr
     orr     r2, r2, #PSR_FIQ  @ Disables fiqs
@@ -39,10 +44,20 @@ swi_handler:
     bic     r0, r0, #0xff000000
 
     @ Set Param 2: pointer to parameters on stack
-    mov     r1, sp
+    add     r1, sp, #8
 
     @ go to handler
     bl      C_SWI_Handler
+
+    @ Disables irqs
+    mrs     r2, cpsr
+    orr     r2, r2, #PSR_FIQ  @ Disables fiqs
+    orr     r2, r2, #PSR_IRQ  @ Disables irqs
+    msr     cpsr, r2
+
+    @ restores user registers
+    ldmfd    sp, {sp, lr}^
+    add      sp, sp, #8
 
     @ restore spsr
     ldr     r2, [sp, #14*4]

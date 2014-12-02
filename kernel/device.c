@@ -82,7 +82,6 @@ void dev_wait(unsigned int dev __attribute__((unused)))
 void dev_update(unsigned long millis __attribute__((unused)))
 {
   tcb_t *temp;
-  int reschedule = 0;
 
   int i;
   for (i = 0; i < NUM_DEVICES; i++)
@@ -97,14 +96,12 @@ void dev_update(unsigned long millis __attribute__((unused)))
       {
         runqueue_add(temp, temp->cur_prio);
         temp = temp->sleep_queue;
-        reschedule = 1;
       }
 
       devices[i].sleep_queue = 0;
     }
   }
 
-  if (reschedule)
-    request_reschedule();
+  dispatch_save();
 }
 

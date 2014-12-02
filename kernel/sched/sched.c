@@ -59,6 +59,8 @@ void request_reschedule()
  */
 void allocate_tasks(task_t** tasks, size_t num_tasks)
 {
+  runqueue_init();
+
   size_t i;
 	for (i = 0; i < num_tasks; i++)
   {
@@ -76,6 +78,8 @@ void allocate_tasks(task_t** tasks, size_t num_tasks)
     context->r6 = (int)task->stack_pos; // usr mode stack pointer
     context->sp = &tcb->kstack_high; // svc mode stack pointer
     context->lr = &launch_task; // kernel load code
+
+    runqueue_add(tcb, i);
   }
 
   i = OS_MAX_TASKS-1;
@@ -91,9 +95,9 @@ void allocate_tasks(task_t** tasks, size_t num_tasks)
   context->r6 = (int)idle_stack; // usr mode stack pointer
   context->sp = &tcb->kstack_high; // svc mode stack pointer
   context->lr = &launch_task; // kernel load code
+  runqueue_add(tcb, i);
 
   // sets the current task to the idle task
   dispatch_init(tcb);
-  idle();
 }
 

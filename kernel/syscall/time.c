@@ -12,6 +12,7 @@
 #include <arm/timer.h>
 #include <arm/reg.h>
 #include <syscall.h>
+#include <device.h>
 
 volatile unsigned long int system_time;
 
@@ -45,6 +46,7 @@ void C_IRQ_Handler()
     uint32_t next_time;
     // increment uptime by 10ms
     system_time += 10;
+    dev_update(system_time);
 
     // increment the match register by 10 ms
     next_time = OSCR + (OSTMR_FREQ/100);

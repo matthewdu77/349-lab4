@@ -47,7 +47,6 @@ int task_create(task_t* tasks, size_t num_tasks)
   allocate_tasks(task_array, num_tasks);
   dispatch_nosave();
 
-
   // This should never return
   return -1;
 }
