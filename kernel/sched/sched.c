@@ -39,11 +39,6 @@ static void idle(void)
   while(1);
 }
 
-void request_reschedule()
-{
-  dispatch_save();
-}
-
 /**
  * @brief Allocate user-stacks and initializes the kernel contexts of the
  * given threads.

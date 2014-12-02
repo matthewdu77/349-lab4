@@ -12,7 +12,7 @@
 	.file "mutex_create.S"
 
 FUNC(mutex_create)
-  swi CREATE_SWI @make the system call
+  swi MUTEX_CREATE @make the system call
 
   @ Return on success
   cmp r0, #0 @success

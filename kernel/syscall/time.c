@@ -46,7 +46,6 @@ void C_IRQ_Handler()
     uint32_t next_time;
     // increment uptime by 10ms
     system_time += 10;
-    dev_update(system_time);
 
     // increment the match register by 10 ms
     next_time = OSCR + (OSTMR_FREQ/100);
@@ -57,6 +56,7 @@ void C_IRQ_Handler()
     // clear OSSR
     reg_set(OSTMR_OSSR_ADDR, OSTMR_OSSR_M0);
 
+    dev_update(system_time);
   }
 }
 

@@ -1,0 +1,6 @@
+PROGS_LOCK_TEST_OBJS := lock_test.o
+PROGS_LOCK_TEST_OBJS := $(PROGS_LOCK_TEST_OBJS:%=$(TDIR)/lock_test/%)
+ALL_OBJS += $(PROGS_LOCK_TEST_OBJS)
+
+$(TDIR)/bin/lock_test : $(TSTART) $(PROGS_LOCK_TEST_OBJS) $(TLIBC)
+

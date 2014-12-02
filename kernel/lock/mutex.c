@@ -17,6 +17,7 @@
 #include <bits/errno.h>
 #include <arm/psr.h>
 #include <arm/exception.h>
+#include <exports.h>
 #ifdef DEBUG_MUTEX
 #include <exports.h> // temp
 #endif
@@ -26,7 +27,6 @@ mutex_t gtMutex[OS_NUM_MUTEX];
 
 void mutex_init()
 {
-  // TODO: clear mutices on task_create()
   int i;
 	for (i = 0; i < OS_NUM_MUTEX; i++)
   {
@@ -107,10 +107,10 @@ int mutex_unlock(int mutex)
   gtMutex[mutex].bLock = 0;
   gtMutex[mutex].pSleep_queue = 0;
   curTcb->holds_lock--;
-  enable_interrupts();
 
   // schedule any higher priority tasks
   dispatch_save();
+  enable_interrupts();
 
 	return 0;
 }
