@@ -3,6 +3,7 @@
 #include <syscall.h>
 #include <constants.h>
 #include <exports.h>
+#include <lock.h>
 
 /* C_SWI_Handler uses SWI number to call the appropriate function. */
 int C_SWI_Handler(int swiNum, int *regs)
@@ -33,6 +34,15 @@ int C_SWI_Handler(int swiNum, int *regs)
     case EVENT_WAIT:
       // int event_wait(unsigned int dev)
       count = event_wait((unsigned int) regs[0]);
+      break;
+    case MUTEX_CREATE:
+      count = mutex_create();
+      break;
+    case MUTEX_LOCK:
+      count = mutex_lock((int) regs[0]);
+      break;
+    case MUTEX_UNLOCK:
+      count = mutex_unlock((int) regs[0]);
       break;
     default:
       invalid_syscall(BAD_CODE);

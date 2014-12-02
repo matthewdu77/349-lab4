@@ -17,6 +17,7 @@
 #include <arm/interrupt.h>
 #include <arm/timer.h>
 #include <arm/reg.h>
+#include <lock.h>
 
 #include <constants.h>
 #include "swi_handler.h"
@@ -95,7 +96,6 @@ int kmain(int argc __attribute__((unused)), char** argv  __attribute__((unused))
 
   app_startup();
   global_data = table;
-  /* add your code up to assert statement */
 
   // Installs the swi handler
   if (check_vector(EX_SWI) == false)
@@ -112,6 +112,9 @@ int kmain(int argc __attribute__((unused)), char** argv  __attribute__((unused))
   }
   int irq_instrs[2] = {0};
   _install_exception_handler(EX_IRQ, (int) &irq_handler, irq_instrs);
+
+  // Initializes mutecies
+  mutex_init();
 
   // Copy argc and argv to user stack in the right order.
   int *spTop = ((int *) USER_STACK_TOP) - 1;
