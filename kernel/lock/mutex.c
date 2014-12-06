@@ -69,6 +69,9 @@ int mutex_lock(int mutex)
   // sleep until mutex is released
   while (gtMutex[mutex].bLock != 0)
   {
+    // priority inheritance
+    if (gtMutex[mutex].pHolding_Tcb->cur_prio > curTcb->cur_prio)
+      gtMutex[mutex].pHolding_Tcb->cur_prio = curTcb->cur_prio;
     curTcb->sleep_queue = gtMutex[mutex].pSleep_queue;
     gtMutex[mutex].pSleep_queue = curTcb;
     dispatch_sleep();
@@ -107,6 +110,9 @@ int mutex_unlock(int mutex)
   gtMutex[mutex].bLock = 0;
   gtMutex[mutex].pSleep_queue = 0;
   curTcb->holds_lock--;
+
+  // priority inheritance
+  curTcb->cur_prio = curTcb->native_prio;
 
   // schedule any higher priority tasks
   dispatch_save();

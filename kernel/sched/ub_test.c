@@ -27,7 +27,7 @@ static const double u[OS_AVAIL_TASKS] = {
   0.697879, 0.697788, 0.697700, 0.697615, 0.697533,
   0.697455, 0.697379, 0.697306, 0.697235, 0.697166,
   0.697100, 0.697036, 0.696974
-}
+};
  
 /**
  * @brief Perform UB Test and reorder the task list.
@@ -74,7 +74,7 @@ int assign_schedule(task_t** tasks, size_t num_tasks)
       admiss += (tasks[j]->C / tasks[j]->T);
     }
 
-    curr_u += (tasks[i]->B / tasks[i]->T);
+    //curr_u += (tasks[i]->B / tasks[i]->T);
 
     if (admiss >= u[i])
       return 0;

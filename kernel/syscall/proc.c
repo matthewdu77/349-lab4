@@ -22,6 +22,8 @@
 #include <arm/physmem.h>
 #include <device.h>
 
+int tasks_created = 0;
+
 int task_create(task_t* tasks, size_t num_tasks)
 {
   size_t i;
@@ -32,18 +34,19 @@ int task_create(task_t* tasks, size_t num_tasks)
   if (!valid_addr(tasks, sizeof(task_t) * num_tasks, USR_START_ADDR, USR_END_ADDR))
   	return -EFAULT;
 
-  // TODO : sanity checking
-  // TODO : ub_test.c assign_schedule(&tasks, num_tasks)
-
   task_t *(task_array[OS_MAX_TASKS]);
   for (i = 0; i < num_tasks; i++)
   {
     task_array[i] = &(tasks[i]);
   }
 
-  assign_schedule(task_array, num_tasks);
+  if (!assign_schedule(task_array, num_tasks))
+  {
+    return -ESCHED;
+  }
 
   disable_interrupts();
+  tasks_created = 1;
   allocate_tasks(task_array, num_tasks);
   dispatch_nosave();
 

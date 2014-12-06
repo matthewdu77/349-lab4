@@ -72,6 +72,7 @@ void dev_wait(unsigned int dev __attribute__((unused)))
 }
 
 
+extern int tasks_created;
 /**
  * @brief Signals the occurrence of an event on all applicable devices. 
  * This function should be called on timer interrupts to determine that 
@@ -87,7 +88,7 @@ void dev_update(unsigned long millis __attribute__((unused)))
   for (i = 0; i < NUM_DEVICES; i++)
   {
     // TODO: not robust against overflow
-    if (millis >= devices[i].next_match)
+    if (millis >= devices[i].next_match && tasks_created)
     {
       devices[i].next_match += dev_freq[i];
       temp = devices[i].sleep_queue;
