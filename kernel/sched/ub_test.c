@@ -71,7 +71,10 @@ int assign_schedule(task_t** tasks, size_t num_tasks)
     
     for (j = 0; j <= i; j++)
     {
-      admiss += (tasks[j]->C / tasks[j]->T);
+      if (tasks[j]->T == 0)
+        return 0;
+
+      admiss += ((double) tasks[j]->C) / ((double) tasks[j]->T);
     }
 
     //curr_u += (tasks[i]->B / tasks[i]->T);
